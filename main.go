@@ -8,6 +8,9 @@ import (
 	"strings"
 )
 
+var doneCheckboxStr string = "- [x]"
+var undoneCheckboxStr string = "- [ ]"
+
 type Do struct {
 	Done bool
 	Task string
@@ -28,31 +31,66 @@ func readFile(file string) []string {
 	return lines
 }
 
-func readDos(file string) []Do {
-	doneStr := "- [x] "
-	undoneStr := "- [ ] "
+func writeFile(file string, lines []string) {
+	f, err := os.Create(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	w := bufio.NewWriter(f)
+	for _, line := range lines {
+		_, err := fmt.Fprintf(w, "%s\n", line)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = w.Flush()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+}
 
+func readDos(file string) []Do {
 	lines := readFile(file)
 	var dos []Do
 	for _, line := range lines {
 		var do Do
-		if strings.HasPrefix(line, undoneStr) {
+		if strings.HasPrefix(line, undoneCheckboxStr) {
 			do.Done = false
-		} else if strings.HasPrefix(line, doneStr) {
+		} else if strings.HasPrefix(line, doneCheckboxStr) {
 			do.Done = true
 		} else {
 			// quietly ignore non-do lines
 			break
 		}
-		do.Task = line[len(doneStr):]
+		do.Task = line[len(doneCheckboxStr)+1:] // add one for space after checkbox
 		dos = append(dos, do)
 	}
 	return dos
 }
 
-func main() {
-	dos := readDos(os.Args[1])
-	for i, do := range dos {
-		fmt.Printf("%d. %s (done? %v)\n", i+1, do.Task, do.Done)
+func writeDos(file string, dos []Do) {
+	// make two slices so that undone items are all first
+	var undoneLines []string
+	var doneLines []string
+	for _, do := range dos {
+		if do.Done {
+			doneLines = append(doneLines, fmt.Sprintf("%s %s", doneCheckboxStr, do.Task))
+		} else {
+			undoneLines = append(undoneLines, fmt.Sprintf("%s %s", undoneCheckboxStr, do.Task))
+		}
 	}
+	writeFile(file, append(undoneLines, doneLines...))
+}
+
+func main() {
+	filename := os.Args[1]
+	dos := readDos(filename)
+
+	action := os.Args[2]
+	if action == "add" {
+		newDo := Do{Done: false, Task: os.Args[3]}
+		dos = append(dos, newDo)
+	}
+	writeDos(filename, dos)
 }

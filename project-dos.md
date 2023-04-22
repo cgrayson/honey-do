@@ -1,9 +1,10 @@
 - [ ] add tests
-- [ ] add to git / GitHub
 - [ ] test bad input
 - [ ] make doneStr (`[x]`) test case-insensitive
 - [ ] make file reading a library
 - [ ] add default assign functionality
-- [ ] add "add" functionality
 - [ ] add "undo" functionality
 - [ ] add "rerun" functionality
+- [ ] add env var for default honey-do filename
+- [x] add "add" functionality
+- [x] add to git / GitHub
