@@ -83,13 +83,29 @@ func writeDos(file string, dos []Do) {
 	writeFile(file, append(undoneLines, doneLines...))
 }
 
+func parseCommandLine(args []string) (string, string, string) {
+	filename := args[1]
+	action := "pull"
+	var task string
+
+	if len(args) > 1 {
+		action = args[2]
+	}
+
+	if action == "add" && len(args) > 2 {
+		task = args[3]
+	}
+
+	return filename, action, task
+}
+
 func main() {
-	filename := os.Args[1]
+	filename, action, task := parseCommandLine(os.Args)
 	dos := readDos(filename)
 
-	action := os.Args[2]
-	if action == "add" {
-		newDo := Do{Done: false, Task: os.Args[3]}
+	switch action {
+	case "add":
+		newDo := Do{Done: false, Task: task}
 		dos = append(dos, newDo)
 	}
 	writeDos(filename, dos)
