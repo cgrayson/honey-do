@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 var doneCheckboxStr string = "- [x]"
@@ -83,12 +85,35 @@ func writeDos(file string, dos []Do) {
 	writeFile(file, append(undoneLines, doneLines...))
 }
 
+func pullDo(dos []Do) {
+	undoneCount := 0
+	for _, do := range dos {
+		if !do.Done {
+			undoneCount++
+		}
+	}
+	rand.Seed(time.Now().UnixNano())
+	r := rand.Intn(undoneCount)
+
+	undoneCount = 0
+	for i, do := range dos {
+		if !do.Done {
+			undoneCount++
+		}
+		if i == r {
+			fmt.Println(dos[i].Task)
+			dos[i].Done = true
+			break
+		}
+	}
+}
+
 func parseCommandLine(args []string) (string, string, string) {
 	filename := args[1]
 	action := "pull"
 	var task string
 
-	if len(args) > 1 {
+	if len(args) > 2 {
 		action = args[2]
 	}
 
@@ -104,6 +129,8 @@ func main() {
 	dos := readDos(filename)
 
 	switch action {
+	case "pull":
+		pullDo(dos)
 	case "add":
 		newDo := Do{Done: false, Task: task}
 		dos = append(dos, newDo)

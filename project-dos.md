@@ -2,9 +2,10 @@
 - [ ] test bad input
 - [ ] make doneStr (`[x]`) test case-insensitive
 - [ ] make file reading a library
-- [ ] add default assign functionality
+- [ ] add metadata to dos
 - [ ] add "undo" functionality
 - [ ] add "rerun" functionality
 - [ ] add env var for default honey-do filename
+- [x] add default assign functionality
 - [x] add "add" functionality
 - [x] add to git / GitHub
