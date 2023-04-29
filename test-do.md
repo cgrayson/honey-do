@@ -1,3 +1,3 @@
-- [ ] another
-- [ ] one damn thing
-- [x] done done DONE
+- [ ] another {"AddedDate":"2023-04-22T14:00:40.793637-05:00","PulledDate":"0001-01-01T00:00:00Z"}
+- [ ] one damn thing {"AddedDate":"2023-04-22T14:00:40.793637-05:00","PulledDate":"0001-01-01T00:00:00Z"}
+- [x] done done DONE {"AddedDate":"2023-04-22T14:00:40.793637-05:00","PulledDate":"2023-04-22T14:10:10.793637-05:00"}
