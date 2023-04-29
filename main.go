@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -13,9 +14,15 @@ import (
 var doneCheckboxStr string = "- [x]"
 var undoneCheckboxStr string = "- [ ]"
 
+type Metadata struct {
+	AddedDate  time.Time
+	PulledDate time.Time
+}
+
 type Do struct {
-	Done bool
-	Task string
+	Done     bool
+	Task     string
+	Metadata Metadata
 }
 
 func readFile(file string) []string {
@@ -28,7 +35,10 @@ func readFile(file string) []string {
 	for input.Scan() {
 		lines = append(lines, input.Text())
 	}
-	f.Close()
+	err = f.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return lines
 }
@@ -65,7 +75,22 @@ func readDos(file string) []Do {
 			// quietly ignore non-do lines
 			break
 		}
-		do.Task = line[len(doneCheckboxStr)+1:] // add one for space after checkbox
+
+		taskStartIndex := len(doneCheckboxStr) + 1 // add one for space after checkbox
+		metaStartIndex := strings.Index(line, " {")
+		if metaStartIndex > taskStartIndex {
+			var m Metadata
+			do.Task = line[taskStartIndex:metaStartIndex]
+			err := json.Unmarshal([]byte(line[metaStartIndex:]), &m)
+			if err != nil {
+				log.Println(err)
+			} else {
+				do.Metadata = m
+			}
+		} else {
+			do.Task = line[taskStartIndex:]
+		}
+
 		dos = append(dos, do)
 	}
 	return dos
@@ -76,10 +101,11 @@ func writeDos(file string, dos []Do) {
 	var undoneLines []string
 	var doneLines []string
 	for _, do := range dos {
+		metaBytes, _ := json.Marshal(do.Metadata)
 		if do.Done {
-			doneLines = append(doneLines, fmt.Sprintf("%s %s", doneCheckboxStr, do.Task))
+			doneLines = append(doneLines, fmt.Sprintf("%s %s %s", doneCheckboxStr, do.Task, metaBytes))
 		} else {
-			undoneLines = append(undoneLines, fmt.Sprintf("%s %s", undoneCheckboxStr, do.Task))
+			undoneLines = append(undoneLines, fmt.Sprintf("%s %s %s", undoneCheckboxStr, do.Task, metaBytes))
 		}
 	}
 	writeFile(file, append(undoneLines, doneLines...))
@@ -103,6 +129,7 @@ func pullDo(dos []Do) {
 		if i == r {
 			fmt.Println(dos[i].Task)
 			dos[i].Done = true
+			dos[i].Metadata.PulledDate = time.Now()
 			break
 		}
 	}
@@ -132,7 +159,7 @@ func main() {
 	case "pull":
 		pullDo(dos)
 	case "add":
-		newDo := Do{Done: false, Task: task}
+		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
 	}
 	writeDos(filename, dos)
