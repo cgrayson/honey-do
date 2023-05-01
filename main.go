@@ -25,19 +25,23 @@ type Do struct {
 	Metadata Metadata
 }
 
+func closeFile(file *os.File) {
+	err := file.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func readFile(file string) []string {
 	f, err := os.Open(file)
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer closeFile(f)
 	var lines []string
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		lines = append(lines, input.Text())
-	}
-	err = f.Close()
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	return lines
@@ -48,6 +52,7 @@ func writeFile(file string, lines []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer closeFile(f)
 	w := bufio.NewWriter(f)
 	for _, line := range lines {
 		_, err := fmt.Fprintf(w, "%s\n", line)
