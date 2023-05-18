@@ -166,6 +166,9 @@ func main() {
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
+	default:
+		fmt.Printf("unrecognized action '%s'\n", action)
+		os.Exit(2)
 	}
 	writeDos(filename, dos)
 }
