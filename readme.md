@@ -1,6 +1,6 @@
 # Honey-Do
 
-Usage: `honey-do filename [ pull (default) | undo | swap | add _"task"_ ]`
+Usage: `honey-do filename [ pull (default) | unpull | swap | add _"task"_ ]`
 
 ---
 

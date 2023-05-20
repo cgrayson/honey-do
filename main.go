@@ -116,6 +116,24 @@ func writeDos(file string, dos []Do) {
 	writeFile(file, append(undoneLines, doneLines...))
 }
 
+func replaceLastPulled(dos []Do) {
+	var i int
+	var do Do
+	replaced := dos[0] // initialize to first one
+
+	// find the latest pulled-date
+	for i, do = range dos {
+		if do.Metadata.PulledDate.After(replaced.Metadata.PulledDate) {
+			replaced = do
+		}
+	}
+	fmt.Printf("replaced '%s'\n", replaced.Task)
+
+	// not sure why using replaced.Done didn't work... :-/
+	dos[i].Done = false
+	dos[i].Metadata.PulledDate = time.Time{}
+}
+
 func pullDo(dos []Do) {
 	undoneCount := 0
 	for _, do := range dos {
@@ -126,11 +144,7 @@ func pullDo(dos []Do) {
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(undoneCount)
 
-	undoneCount = 0
-	for i, do := range dos {
-		if !do.Done {
-			undoneCount++
-		}
+	for i, _ := range dos {
 		if i == r {
 			fmt.Println(dos[i].Task)
 			dos[i].Done = true
@@ -166,6 +180,8 @@ func main() {
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
+	case "unpull":
+		replaceLastPulled(dos)
 	default:
 		fmt.Printf("unrecognized action '%s'\n", action)
 		os.Exit(2)
