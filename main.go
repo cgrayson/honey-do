@@ -116,10 +116,10 @@ func writeDos(file string, dos []Do) {
 	writeFile(file, append(undoneLines, doneLines...))
 }
 
-func replaceLastPulled(dos []Do) {
+func replaceLastPulled(dos []Do) (replaced Do) {
 	var i int
 	var do Do
-	replaced := dos[0] // initialize to first one
+	replaced = dos[0] // initialize to first one
 
 	// find the latest pulled-date
 	for i, do = range dos {
@@ -132,9 +132,11 @@ func replaceLastPulled(dos []Do) {
 	// not sure why using replaced.Done didn't work... :-/
 	dos[i].Done = false
 	dos[i].Metadata.PulledDate = time.Time{}
+
+	return
 }
 
-func pullDo(dos []Do) {
+func pullDo(dos []Do) (aDo Do) {
 	undoneCount := 0
 	for _, do := range dos {
 		if !do.Done {
@@ -149,9 +151,11 @@ func pullDo(dos []Do) {
 			fmt.Println(dos[i].Task)
 			dos[i].Done = true
 			dos[i].Metadata.PulledDate = time.Now()
+			aDo = dos[i]
 			break
 		}
 	}
+	return
 }
 
 func parseCommandLine(args []string) (string, string, string) {
@@ -181,7 +185,15 @@ func main() {
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
 	case "unpull":
-		replaceLastPulled(dos)
+		_ = replaceLastPulled(dos)
+	case "swap":
+		aDo := replaceLastPulled(dos)
+		for {
+			newDo := pullDo(dos)
+			if newDo.Task != aDo.Task {
+				break
+			}
+		}
 	default:
 		fmt.Printf("unrecognized action '%s'\n", action)
 		os.Exit(2)
