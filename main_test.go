@@ -190,3 +190,10 @@ func TestAddAndFilenameWithEnv(t *testing.T) {
 		t.Errorf("task text should be set (%s)", taskText)
 	}
 }
+
+func TestReadDos(t *testing.T) {
+	dos := readDos("./fixtures/test-fixture.md")
+	if len(dos) != 3 {
+		t.Errorf("there should be 3 dos (%d)", len(dos))
+	}
+}

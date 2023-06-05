@@ -6,6 +6,10 @@ A default honey-do file can be set via the environment variable `HONEY_DO_FILE`.
 When set, no `filename` is needed on the command line. If one is given, it will
 override the environment variable.
 
+## Development
+
+- `go test` to run test suite
+
 ---
 
 original notes (4/17/23)

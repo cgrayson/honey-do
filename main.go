@@ -75,7 +75,7 @@ func readDos(file string) []Do {
 		var do Do
 		if strings.HasPrefix(line, undoneCheckboxStr) {
 			do.Done = false
-		} else if strings.HasPrefix(line, doneCheckboxStr) {
+		} else if strings.HasPrefix(strings.ToLower(line), doneCheckboxStr) { // match [x] or [X]
 			do.Done = true
 		} else {
 			// quietly ignore non-do lines
