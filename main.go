@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"log"
 	"math/rand"
 	"os"
@@ -158,24 +159,45 @@ func pullDo(dos []Do) (aDo Do) {
 	return
 }
 
-func parseCommandLine(args []string) (string, string, string) {
-	filename := args[1]
-	action := "pull"
-	var task string
+// possibilities:
+// honey-do
+// honey-do pull
+// honey-do filename
+// honey-do pull filename
+// honey-do add "task"
+// honey-do add "task" filename
+// etc.
+func parseCommandLine(args []string) (action string, filename string, newTask string) {
+	validActions := []string{"pull", "add", "unpull", "swap"}
 
-	if len(args) > 2 {
-		action = args[2]
+	for i := 1; i < len(args); i++ {
+		currentArg := args[i]
+		if slices.Contains(validActions, currentArg) {
+			action = currentArg
+
+			if action == "add" {
+				i++
+				newTask = args[i]
+			}
+		} else {
+			// must be a filename
+			filename = currentArg
+		}
 	}
 
-	if action == "add" && len(args) > 2 {
-		task = args[3]
+	// apply defaults if needed
+	if action == "" {
+		action = "pull"
 	}
-
-	return filename, action, task
+	if filename == "" {
+		filename = os.Getenv("HONEY_DO_FILE")
+	}
+	return
 }
 
 func main() {
-	filename, action, task := parseCommandLine(os.Args)
+	action, filename, task := parseCommandLine(os.Args)
+	// todo: bonk on empty filename
 	dos := readDos(filename)
 
 	switch action {

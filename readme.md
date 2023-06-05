@@ -1,6 +1,10 @@
 # Honey-Do
 
-Usage: `honey-do filename [ pull (default) | unpull | swap | add _"task"_ ]`
+Usage: `honey-do [ pull (default) | unpull | swap | add _"task"_ ] filename`
+
+A default honey-do file can be set via the environment variable `HONEY_DO_FILE`. 
+When set, no `filename` is needed on the command line. If one is given, it will
+override the environment variable.
 
 ---
 

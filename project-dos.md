@@ -1,8 +1,9 @@
-- [ ] add env var for default honey-do filename
 - [ ] add tests
 - [ ] make doneStr (`[x]`) test case-insensitive
 - [ ] test & prevent bad input
+- [ ] italicize JSON metadata (?)
 - [ ] make file reading a library
+- [x] add env var for default honey-do filename
 - [x] add "swap" functionality
 - [x] add "unpull" (previously "undo") functionality
 - [x] add metadata to dos
