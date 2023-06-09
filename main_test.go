@@ -191,9 +191,23 @@ func TestAddAndFilenameWithEnv(t *testing.T) {
 	}
 }
 
-func TestReadDos(t *testing.T) {
-	dos := readDos("./fixtures/test-fixture.md")
+func TestReadDosSuccess(t *testing.T) {
+	dos := readDos("./fixtures/fixture-test.md")
 	if len(dos) != 3 {
 		t.Errorf("there should be 3 dos (%d)", len(dos))
+	}
+}
+
+func TestReadDosEmptyFile(t *testing.T) {
+	dos := readDos("./fixtures/fixture-empty.md")
+	if len(dos) > 0 {
+		t.Errorf("there should be 0 dos (%d)", len(dos))
+	}
+}
+
+func TestPullDoEmptyFile(t *testing.T) {
+	pulled := pullDo([]Do{})
+	if pulled.Task != "" {
+		t.Errorf("pulled should be empty (%s)", pulled.Task)
 	}
 }

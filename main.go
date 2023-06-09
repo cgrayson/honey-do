@@ -144,17 +144,22 @@ func pullDo(dos []Do) (aDo Do) {
 			undoneCount++
 		}
 	}
-	rand.Seed(time.Now().UnixNano())
-	r := rand.Intn(undoneCount)
 
-	for i, _ := range dos {
-		if i == r {
-			fmt.Println(dos[i].Task)
-			dos[i].Done = true
-			dos[i].Metadata.PulledDate = time.Now()
-			aDo = dos[i]
-			break
+	if undoneCount > 0 {
+		rand.Seed(time.Now().UnixNano())
+		r := rand.Intn(undoneCount)
+
+		for i, _ := range dos {
+			if i == r {
+				fmt.Println(dos[i].Task)
+				dos[i].Done = true
+				dos[i].Metadata.PulledDate = time.Now()
+				aDo = dos[i]
+				break
+			}
 		}
+	} else {
+		fmt.Println("[no undone tasks found!]")
 	}
 	return
 }

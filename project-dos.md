@@ -1,8 +1,9 @@
 - [ ] add tests
-- [ ] test & prevent bad filename
 - [ ] test & prevent other bad input (?)
 - [ ] italicize JSON metadata (?)
 - [ ] make file reading a library
+- [x] handle empty file / no more undone dos
+- [x] test & prevent bad filename [log.fatal, good enough lol]
 - [x] make doneStr (`[x]`) test case-insensitive
 - [x] add env var for default honey-do filename
 - [x] add "swap" functionality
