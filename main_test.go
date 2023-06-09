@@ -191,6 +191,21 @@ func TestAddAndFilenameWithEnv(t *testing.T) {
 	}
 }
 
+// honey-do foo
+func TestInvalidActionOnly(t *testing.T) {
+	_ = os.Unsetenv("HONEY_DO_FILE")
+	action, filename, taskText := parseCommandLine(append(baseArgs, "foo"))
+	if action != "pull" {
+		t.Errorf("action should be pull (%s)", action)
+	}
+	if filename != "foo" {
+		t.Errorf("filename should be foo (%s)", filename)
+	}
+	if taskText != "" {
+		t.Errorf("task text should be empty (%s)", taskText)
+	}
+}
+
 func TestReadDosSuccess(t *testing.T) {
 	dos := readDos("./fixtures/fixture-test.md")
 	if len(dos) != 3 {
