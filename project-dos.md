@@ -1,7 +1,13 @@
+- [ ] what if the file is read-only?
+- [ ] what if an added task is empty? or just whitespace?
+- [ ] what if user does unpull or swap and there are no done dos? (add message)
+- [ ] is there a better way to check for a nil Do than comparing .Task to ""?
+- [ ] move output to "main" function (and make 'add' have some)
 - [ ] add tests
 - [ ] test & prevent other bad input (?)
 - [ ] italicize JSON metadata (?)
 - [ ] make file reading a library
+- [x] fix overwriting of file on no tasks found
 - [x] handle empty file / no more undone dos
 - [x] test & prevent bad filename [log.fatal, good enough lol]
 - [x] make doneStr (`[x]`) test case-insensitive

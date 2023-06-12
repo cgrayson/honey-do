@@ -118,22 +118,23 @@ func writeDos(file string, dos []Do) {
 }
 
 func replaceLastPulled(dos []Do) (replaced Do) {
-	var i int
-	var do Do
-	replaced = dos[0] // initialize to first one
+	if len(dos) > 0 {
+		var i int
+		var do Do
+		replaced = dos[0] // initialize to first one
 
-	// find the latest pulled-date
-	for i, do = range dos {
-		if do.Metadata.PulledDate.After(replaced.Metadata.PulledDate) {
-			replaced = do
+		// find the latest pulled-date
+		for i, do = range dos {
+			if do.Metadata.PulledDate.After(replaced.Metadata.PulledDate) {
+				replaced = do
+			}
 		}
+		fmt.Printf("replaced '%s'\n", replaced.Task)
+
+		// not sure why using replaced.Done didn't work... :-/
+		dos[i].Done = false
+		dos[i].Metadata.PulledDate = time.Time{}
 	}
-	fmt.Printf("replaced '%s'\n", replaced.Task)
-
-	// not sure why using replaced.Done didn't work... :-/
-	dos[i].Done = false
-	dos[i].Metadata.PulledDate = time.Time{}
-
 	return
 }
 
@@ -202,28 +203,42 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 
 func main() {
 	action, filename, task := parseCommandLine(os.Args)
+
+	// todo: move this processing to another function so it can be tested
 	// todo: bonk on empty filename
 	dos := readDos(filename)
 
+	// todo: put out message & skip the rest here on no dos
+	// (todo: consider factoring writeDos() calls back out after that)
+
 	switch action {
 	case "pull":
-		pullDo(dos)
+		ado := pullDo(dos)
+		if ado.Task != "" {
+			writeDos(filename, dos)
+		}
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
+		writeDos(filename, dos)
 	case "unpull":
-		_ = replaceLastPulled(dos)
+		ado := replaceLastPulled(dos)
+		if ado.Task != "" {
+			writeDos(filename, dos)
+		}
 	case "swap":
 		aDo := replaceLastPulled(dos)
-		for {
-			newDo := pullDo(dos)
-			if newDo.Task != aDo.Task {
-				break
+		if aDo.Task != "" {
+			for {
+				newDo := pullDo(dos)
+				if newDo.Task != aDo.Task {
+					break
+				}
 			}
+			writeDos(filename, dos)
 		}
 	default:
 		fmt.Printf("unrecognized action '%s'\n", action)
 		os.Exit(2)
 	}
-	writeDos(filename, dos)
 }
