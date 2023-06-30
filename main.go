@@ -117,25 +117,25 @@ func writeDos(file string, dos []Do) {
 	writeFile(file, append(undoneLines, doneLines...))
 }
 
-func replaceLastPulled(dos []Do) (replaced Do) {
+func replaceLastPulled(dos []Do) Do {
+	replacedIndex := 0
 	if len(dos) > 0 {
-		var i int
-		var do Do
-		replaced = dos[0] // initialize to first one
+		latest := dos[0] // initialize to first one
 
 		// find the latest pulled-date
-		for i, do = range dos {
-			if do.Metadata.PulledDate.After(replaced.Metadata.PulledDate) {
-				replaced = do
+		for i, do := range dos {
+			if do.Metadata.PulledDate.After(latest.Metadata.PulledDate) {
+				replacedIndex = i
+				latest = dos[replacedIndex]
 			}
 		}
-		fmt.Printf("replaced '%s'\n", replaced.Task)
+		fmt.Printf("replaced '%s'\n", latest.Task)
 
-		// not sure why using replaced.Done didn't work... :-/
-		dos[i].Done = false
-		dos[i].Metadata.PulledDate = time.Time{}
+		// have to make updates directly to the slice element (not the reference, 'latest')
+		dos[replacedIndex].Done = false
+		dos[replacedIndex].Metadata.PulledDate = time.Time{}
 	}
-	return
+	return dos[replacedIndex]
 }
 
 func pullDo(dos []Do) (aDo Do) {
@@ -201,31 +201,17 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 	return
 }
 
-func main() {
-	action, filename, task := parseCommandLine(os.Args)
-
-	// todo: move this processing to another function so it can be tested
-	// todo: bonk on empty filename
-	dos := readDos(filename)
-
-	// todo: put out message & skip the rest here on no dos
-	// (todo: consider factoring writeDos() calls back out after that)
-
+func act(action string, dos []Do, task string) (updatedDos []Do) {
 	switch action {
 	case "pull":
-		ado := pullDo(dos)
-		if ado.Task != "" {
-			writeDos(filename, dos)
-		}
+		aDo := pullDo(dos)
+		fmt.Println("[ado is: " + aDo.Task + "]")
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
 		dos = append(dos, newDo)
-		writeDos(filename, dos)
 	case "unpull":
-		ado := replaceLastPulled(dos)
-		if ado.Task != "" {
-			writeDos(filename, dos)
-		}
+		aDo := replaceLastPulled(dos)
+		fmt.Println("[ado is: " + aDo.Task + "]")
 	case "swap":
 		aDo := replaceLastPulled(dos)
 		if aDo.Task != "" {
@@ -235,10 +221,25 @@ func main() {
 					break
 				}
 			}
-			writeDos(filename, dos)
 		}
 	default:
 		fmt.Printf("unrecognized action '%s'\n", action)
 		os.Exit(2)
+	}
+
+	return dos
+}
+
+func main() {
+	action, filename, task := parseCommandLine(os.Args)
+
+	// todo: bonk on empty filename
+	dos := readDos(filename)
+
+	// todo: put out message & skip the rest here on no dos
+	updatedDos := act(action, dos, task)
+
+	if len(updatedDos) > 0 {
+		writeDos(filename, dos)
 	}
 }

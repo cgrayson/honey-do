@@ -1,4 +1,3 @@
-- [ ] fix unpulls, which don't mark the right Do as undone when there are multiples
 - [ ] what if the file is read-only?
 - [ ] what if an added task is empty? or just whitespace?
 - [ ] what if user does unpull or swap and there are no done dos? (add message)
@@ -10,6 +9,7 @@
 - [ ] change so that invalid action isn't ignored/defaulted to 'pull'
 - [ ] italicize JSON metadata (?)
 - [ ] make file reading a library
+- [x] fix unpulls, which don't mark the right Do as undone when there are multiples
 - [x] fix overwriting of file on no tasks found
 - [x] handle empty file / no more undone dos
 - [x] test & prevent bad filename [log.fatal, good enough lol]
