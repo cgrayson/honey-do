@@ -1,14 +1,14 @@
+- [ ] **move output to "act" function (and make 'add' have some)**
 - [ ] what if the file is read-only?
-- [ ] what if an added task is empty? or just whitespace?
 - [ ] is there a better way to check for a nil Do than comparing .Task to ""?
-- [ ] move output to "main" function (and make 'add' have some)
 - [ ] add tests
   - [ ] test for empty file (pull, unpull, & swap)
   - [ ] test unpull for item not marked done but with pulled timestamp (corrupt file)
+  - [ ] what if an added task is empty? or just whitespace?
 - [ ] test & prevent other bad input (?)
 - [ ] change so that invalid action isn't ignored/defaulted to 'pull'
-- [ ] italicize JSON metadata (?)
 - [ ] make file reading a library
+- [x] ~~italicize JSON metadata (?)~~ [nah]
 - [x] what if user does unpull or swap and there are no done dos? (add message)
 - [x] handle 'unpull' on file with no pulled tasks
 - [x] fix unpulls, which don't mark the right Do as undone when there are multiples

@@ -206,13 +206,14 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 	return
 }
 
-func act(action string, dos []Do, task string) (updatedDos []Do) {
+func act(action string, dos []Do, task string) []Do {
 	switch action {
 	case "pull":
 		aDo := pullDo(dos)
 		fmt.Println("[ado is: " + aDo.Task + "]")
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
+		fmt.Println("[newdo is: " + newDo.Task + "]")
 		dos = append(dos, newDo)
 	case "unpull":
 		aDo := replaceLastPulled(dos)
@@ -228,7 +229,7 @@ func act(action string, dos []Do, task string) (updatedDos []Do) {
 			}
 		}
 	default:
-		fmt.Printf("unrecognized action '%s'\n", action)
+		fmt.Printf("oops: unrecognized action '%s'\n", action)
 		os.Exit(2)
 	}
 
@@ -238,13 +239,18 @@ func act(action string, dos []Do, task string) (updatedDos []Do) {
 func main() {
 	action, filename, task := parseCommandLine(os.Args)
 
-	// todo: bonk on empty filename
-	dos := readDos(filename)
+	if filename == "" {
+		fmt.Println("oops: you have to specify a honey-do file to work with")
+	} else {
+		dos := readDos(filename)
+		if len(dos) == 0 && action != "add" {
+			fmt.Printf("oops: no to-dos found in the file '%s'\n", filename)
+		} else {
+			updatedDos := act(action, dos, task)
 
-	// todo: put out message & skip the rest here on no dos
-	updatedDos := act(action, dos, task)
-
-	if len(updatedDos) > 0 {
-		writeDos(filename, dos)
+			if len(updatedDos) > 0 {
+				writeDos(filename, updatedDos)
+			}
+		}
 	}
 }
