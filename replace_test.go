@@ -23,9 +23,9 @@ func verifyReplacedDo(replacedDo Do, taskText string) string {
 
 func TestReplace(t *testing.T) {
 	dos := readDos("./fixtures/fixture-test.md")
-	replacedDo := replaceLastPulled(dos)
 
-	// test all aspects of the return value
+	// first pull: replace "DONE DO"
+	replacedDo := replaceLastPulled(dos)
 	if err := verifyReplacedDo(replacedDo, "DONE DO"); err != "" {
 		t.Errorf(err)
 	}
@@ -38,11 +38,28 @@ func TestReplace(t *testing.T) {
 			break
 		}
 	}
-
 	if err := verifyReplacedDo(sliceDo, "DONE DO"); err != "" {
 		t.Errorf(err)
 	}
 
-	// todo next time: more tests:
-	// what if no replaced found?
+	// second pull: replace "done do"
+	replacedDo = replaceLastPulled(dos)
+	if err := verifyReplacedDo(replacedDo, "done do"); err != "" {
+		t.Errorf(err)
+	}
+	for _, do := range dos {
+		if do.Task == "done do" {
+			sliceDo = do
+			break
+		}
+	}
+	if err := verifyReplacedDo(sliceDo, "done do"); err != "" {
+		t.Errorf(err)
+	}
+
+	// third pull: nothing left to replace
+	replacedDo = replaceLastPulled(dos)
+	if err := verifyReplacedDo(replacedDo, ""); err != "" {
+		t.Errorf(err)
+	}
 }

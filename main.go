@@ -118,10 +118,9 @@ func writeDos(file string, dos []Do) {
 }
 
 func replaceLastPulled(dos []Do) Do {
-	replacedIndex := 0
+	replacedIndex := -1
+	latest := Do{} // initialize to empty Do
 	if len(dos) > 0 {
-		latest := dos[0] // initialize to first one
-
 		// find the latest pulled-date
 		for i, do := range dos {
 			if do.Metadata.PulledDate.After(latest.Metadata.PulledDate) {
@@ -129,13 +128,19 @@ func replaceLastPulled(dos []Do) Do {
 				latest = dos[replacedIndex]
 			}
 		}
-		fmt.Printf("replaced '%s'\n", latest.Task)
+		if replacedIndex >= 0 {
+			fmt.Printf("replaced '%s'\n", latest.Task)
 
-		// have to make updates directly to the slice element (not the reference, 'latest')
-		dos[replacedIndex].Done = false
-		dos[replacedIndex].Metadata.PulledDate = time.Time{}
+			// have to make updates directly to the slice element (not the reference, 'latest')
+			dos[replacedIndex].Done = false
+			dos[replacedIndex].Metadata.PulledDate = time.Time{}
+
+			return dos[replacedIndex]
+		} else {
+			fmt.Println("no done tasks found")
+		}
 	}
-	return dos[replacedIndex]
+	return latest
 }
 
 func pullDo(dos []Do) (aDo Do) {
