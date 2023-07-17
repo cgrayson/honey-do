@@ -129,15 +129,11 @@ func replaceLastPulled(dos []Do) Do {
 			}
 		}
 		if replacedIndex >= 0 {
-			fmt.Printf("replaced '%s'\n", latest.Task)
-
 			// have to make updates directly to the slice element (not the reference, 'latest')
 			dos[replacedIndex].Done = false
 			dos[replacedIndex].Metadata.PulledDate = time.Time{}
 
 			return dos[replacedIndex]
-		} else {
-			fmt.Println("no done tasks found")
 		}
 	}
 	return latest
@@ -157,17 +153,14 @@ func pullDo(dos []Do) (aDo Do) {
 
 		for i, _ := range dos {
 			if i == r {
-				fmt.Println(dos[i].Task)
 				dos[i].Done = true
 				dos[i].Metadata.PulledDate = time.Now()
 				aDo = dos[i]
 				break
 			}
 		}
-	} else {
-		fmt.Println("[no undone tasks found!]")
 	}
-	return
+	return aDo
 }
 
 // possibilities:
@@ -210,26 +203,37 @@ func act(action string, dos []Do, task string) []Do {
 	switch action {
 	case "pull":
 		aDo := pullDo(dos)
-		fmt.Println("[ado is: " + aDo.Task + "]")
+		if aDo.Task != "" {
+			fmt.Printf("your task is: %s\n", aDo.Task)
+		} else {
+			fmt.Println("[no undone tasks found!]")
+		}
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
-		fmt.Println("[newdo is: " + newDo.Task + "]")
+		fmt.Printf("added task: %s\n", newDo.Task)
 		dos = append(dos, newDo)
 	case "unpull":
 		aDo := replaceLastPulled(dos)
-		fmt.Println("[ado is: " + aDo.Task + "]")
+		if aDo.Task != "" {
+			fmt.Printf("returned task: %s\n", aDo.Task)
+		} else {
+			fmt.Println("[no tasks to return]")
+		}
 	case "swap":
 		aDo := replaceLastPulled(dos)
 		if aDo.Task != "" {
+			fmt.Printf("returned task: %s\n", aDo.Task)
 			for {
 				newDo := pullDo(dos)
 				if newDo.Task != aDo.Task {
+					// todo: fix if newDo.Task is ""
+					fmt.Printf("your new task is: %s\n", newDo.Task)
 					break
 				}
 			}
 		}
 	default:
-		fmt.Printf("oops: unrecognized action '%s'\n", action)
+		fmt.Printf("[oops: unrecognized action '%s']\n", action)
 		os.Exit(2)
 	}
 
@@ -240,11 +244,11 @@ func main() {
 	action, filename, task := parseCommandLine(os.Args)
 
 	if filename == "" {
-		fmt.Println("oops: you have to specify a honey-do file to work with")
+		fmt.Println("[oops: you have to specify a honey-do file to work with]")
 	} else {
 		dos := readDos(filename)
 		if len(dos) == 0 && action != "add" {
-			fmt.Printf("oops: no to-dos found in the file '%s'\n", filename)
+			fmt.Printf("[oops: no to-dos found in the file '%s']\n", filename)
 		} else {
 			updatedDos := act(action, dos, task)
 

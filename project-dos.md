@@ -1,4 +1,4 @@
-- [ ] **move output to "act" function (and make 'add' have some)**
+- [ ] add handling if user does 'swap' but all tasks done
 - [ ] what if the file is read-only?
 - [ ] is there a better way to check for a nil Do than comparing .Task to ""?
 - [ ] add tests
@@ -8,6 +8,7 @@
 - [ ] test & prevent other bad input (?)
 - [ ] change so that invalid action isn't ignored/defaulted to 'pull'
 - [ ] make file reading a library
+- [x] move output to "act" function (and make 'add' have some)
 - [x] ~~italicize JSON metadata (?)~~ [nah]
 - [x] what if user does unpull or swap and there are no done dos? (add message)
 - [x] handle 'unpull' on file with no pulled tasks
