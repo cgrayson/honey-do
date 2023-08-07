@@ -123,7 +123,8 @@ func replaceLastPulled(dos []Do) Do {
 	if len(dos) > 0 {
 		// find the latest pulled-date
 		for i, do := range dos {
-			if do.Metadata.PulledDate.After(latest.Metadata.PulledDate) {
+			// PulledDate shouldn't be set at all if Done isn't true, but just in case
+			if do.Done && do.Metadata.PulledDate.After(latest.Metadata.PulledDate) {
 				replacedIndex = i
 				latest = dos[replacedIndex]
 			}
@@ -139,17 +140,22 @@ func replaceLastPulled(dos []Do) Do {
 	return latest
 }
 
-func pullDo(dos []Do) (aDo Do) {
+func countUndone(dos []Do) int {
 	undoneCount := 0
 	for _, do := range dos {
 		if !do.Done {
 			undoneCount++
 		}
 	}
+	return undoneCount
+}
 
-	if undoneCount > 0 {
+func pullDo(dos []Do) (aDo Do) {
+	numUndone := countUndone(dos)
+
+	if numUndone > 0 {
 		rand.Seed(time.Now().UnixNano())
-		r := rand.Intn(undoneCount)
+		r := rand.Intn(numUndone)
 
 		for i, _ := range dos {
 			if i == r {
@@ -200,11 +206,15 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 }
 
 func act(action string, dos []Do, task string) []Do {
+	numUndone := countUndone(dos)
+
 	switch action {
 	case "pull":
-		aDo := pullDo(dos)
-		if aDo.Task != "" {
-			fmt.Printf("your task is: %s\n", aDo.Task)
+		if numUndone >= 1 {
+			aDo := pullDo(dos)
+			if aDo.Task != "" {
+				fmt.Printf("your task is: %s\n", aDo.Task)
+			}
 		} else {
 			fmt.Println("[no undone tasks found!]")
 		}
@@ -220,17 +230,25 @@ func act(action string, dos []Do, task string) []Do {
 			fmt.Println("[no tasks to return]")
 		}
 	case "swap":
-		aDo := replaceLastPulled(dos)
-		if aDo.Task != "" {
-			fmt.Printf("returned task: %s\n", aDo.Task)
-			for {
-				newDo := pullDo(dos)
-				if newDo.Task != aDo.Task {
-					// todo: fix if newDo.Task is ""
-					fmt.Printf("your new task is: %s\n", newDo.Task)
-					break
+		if numUndone >= 1 { // have to have at least 1 undone to swap
+			aDo := replaceLastPulled(dos)
+			if aDo.Task != "" {
+				fmt.Printf("returned task: %s\n", aDo.Task)
+				for {
+					newDo := pullDo(dos)
+					if newDo.Task == aDo.Task {
+						// put it back again
+						replaceLastPulled(dos)
+					} else {
+						fmt.Printf("your new task is: %s\n", newDo.Task)
+						break
+					}
 				}
+			} else {
+				fmt.Println("[no tasks to return]")
 			}
+		} else {
+			fmt.Println("[no undone tasks to swap for!]")
 		}
 	default:
 		fmt.Printf("[oops: unrecognized action '%s']\n", action)

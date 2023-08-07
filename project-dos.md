@@ -1,4 +1,5 @@
-- [ ] add handling if user does 'swap' but all tasks done
+- [ ] change act() to return its message, so it can be tested
+- [ ] add help info flag / default on bad options
 - [ ] what if the file is read-only?
 - [ ] is there a better way to check for a nil Do than comparing .Task to ""?
 - [ ] add tests
@@ -8,6 +9,8 @@
 - [ ] test & prevent other bad input (?)
 - [ ] change so that invalid action isn't ignored/defaulted to 'pull'
 - [ ] make file reading a library
+- [x] fix bug in swap: when only one task undone, it says it returns and pulls a new one, but all are marked done (maybe swap tests could help)
+- [x] add handling if user does 'swap' but all tasks done
 - [x] move output to "act" function (and make 'add' have some)
 - [x] ~~italicize JSON metadata (?)~~ [nah]
 - [x] what if user does unpull or swap and there are no done dos? (add message)
