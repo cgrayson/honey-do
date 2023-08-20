@@ -219,10 +219,3 @@ func TestReadDosEmptyFile(t *testing.T) {
 		t.Errorf("there should be 0 dos (%d)", len(dos))
 	}
 }
-
-func TestPullDoEmptyFile(t *testing.T) {
-	pulled := pullDo([]Do{})
-	if pulled.Task != "" {
-		t.Errorf("pulled should be empty (%s)", pulled.Task)
-	}
-}

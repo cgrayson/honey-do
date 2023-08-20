@@ -156,12 +156,18 @@ func pullDo(dos []Do) (aDo Do) {
 	if numUndone > 0 {
 		rand.Seed(time.Now().UnixNano())
 		r := rand.Intn(numUndone)
+		undoneIndex := -1
 
-		for i, _ := range dos {
-			if i == r {
+		var i int
+		for i, aDo = range dos {
+			if !aDo.Done {
+				undoneIndex++
+			}
+			// check the random # against how many undones we've gone through
+			if undoneIndex == r {
+				// use the true index to mark done & set date
 				dos[i].Done = true
 				dos[i].Metadata.PulledDate = time.Now()
-				aDo = dos[i]
 				break
 			}
 		}
@@ -205,7 +211,8 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 	return
 }
 
-func act(action string, dos []Do, task string) []Do {
+func act(action string, dos []Do, task string) ([]Do, string) {
+	var message string
 	numUndone := countUndone(dos)
 
 	switch action {
@@ -213,49 +220,48 @@ func act(action string, dos []Do, task string) []Do {
 		if numUndone >= 1 {
 			aDo := pullDo(dos)
 			if aDo.Task != "" {
-				fmt.Printf("your task is: %s\n", aDo.Task)
+				message = fmt.Sprintf("your task is: %s", aDo.Task)
 			}
 		} else {
-			fmt.Println("[no undone tasks found!]")
+			message = fmt.Sprintf("[no undone tasks found!]")
 		}
 	case "add":
 		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
-		fmt.Printf("added task: %s\n", newDo.Task)
+		message = fmt.Sprintf("added task: %s", newDo.Task)
 		dos = append(dos, newDo)
 	case "unpull":
 		aDo := replaceLastPulled(dos)
 		if aDo.Task != "" {
-			fmt.Printf("returned task: %s\n", aDo.Task)
+			message = fmt.Sprintf("returned task: %s", aDo.Task)
 		} else {
-			fmt.Println("[no tasks to return]")
+			message = fmt.Sprintf("[no tasks to return]")
 		}
 	case "swap":
 		if numUndone >= 1 { // have to have at least 1 undone to swap
 			aDo := replaceLastPulled(dos)
 			if aDo.Task != "" {
-				fmt.Printf("returned task: %s\n", aDo.Task)
+				message = fmt.Sprintf("returned task: %s", aDo.Task)
 				for {
 					newDo := pullDo(dos)
 					if newDo.Task == aDo.Task {
 						// put it back again
 						replaceLastPulled(dos)
 					} else {
-						fmt.Printf("your new task is: %s\n", newDo.Task)
+						message += fmt.Sprintf("\nyour new task is: %s", newDo.Task)
 						break
 					}
 				}
 			} else {
-				fmt.Println("[no tasks to return]")
+				message = fmt.Sprintf("[no tasks to return]")
 			}
 		} else {
-			fmt.Println("[no undone tasks to swap for!]")
+			message = fmt.Sprintf("[no undone tasks to swap for!]")
 		}
 	default:
-		fmt.Printf("[oops: unrecognized action '%s']\n", action)
-		os.Exit(2)
+		message = fmt.Sprintf("[oops: unrecognized action '%s']", action)
 	}
 
-	return dos
+	return dos, message
 }
 
 func main() {
@@ -268,7 +274,8 @@ func main() {
 		if len(dos) == 0 && action != "add" {
 			fmt.Printf("[oops: no to-dos found in the file '%s']\n", filename)
 		} else {
-			updatedDos := act(action, dos, task)
+			updatedDos, message := act(action, dos, task)
+			fmt.Println(message)
 
 			if len(updatedDos) > 0 {
 				writeDos(filename, updatedDos)

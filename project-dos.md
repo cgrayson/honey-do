@@ -1,14 +1,16 @@
-- [ ] change act() to return its message, so it can be tested
 - [ ] add help info flag / default on bad options
 - [ ] what if the file is read-only?
 - [ ] is there a better way to check for a nil Do than comparing .Task to ""?
 - [ ] add tests
+  - [ ] for pullDo()
   - [ ] test for empty file (pull, unpull, & swap)
   - [ ] test unpull for item not marked done but with pulled timestamp (corrupt file)
   - [ ] what if an added task is empty? or just whitespace?
+  - [x] for act()
 - [ ] test & prevent other bad input (?)
 - [ ] change so that invalid action isn't ignored/defaulted to 'pull'
 - [ ] make file reading a library
+- [x] change act() to return its message, so it can be tested
 - [x] fix bug in swap: when only one task undone, it says it returns and pulls a new one, but all are marked done (maybe swap tests could help)
 - [x] add handling if user does 'swap' but all tasks done
 - [x] move output to "act" function (and make 'add' have some)
