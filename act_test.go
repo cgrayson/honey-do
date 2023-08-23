@@ -19,6 +19,13 @@ func TestPullAction(t *testing.T) {
 	verifyMessage(t, message, "[no undone tasks found!]")
 }
 
+func TestPullActionEmptyList(t *testing.T) {
+	dos := []Do{}
+
+	_, message := act("pull", dos, "")
+	verifyMessage(t, message, "[no undone tasks found!]")
+}
+
 func TestAddAction(t *testing.T) {
 	dos := readDos("./fixtures/fixture-test.md")
 
@@ -41,6 +48,13 @@ func TestUnpullAction(t *testing.T) {
 	verifyMessage(t, message, "[no tasks to return]")
 }
 
+func TestUnpullActionEmptyList(t *testing.T) {
+	dos := []Do{}
+
+	_, message := act("unpull", dos, "")
+	verifyMessage(t, message, "[no tasks to return]")
+}
+
 func TestSwapAction(t *testing.T) {
 	dos := readDos("./fixtures/fixture-test.md")
 
@@ -51,6 +65,17 @@ func TestSwapAction(t *testing.T) {
 	// then pull to get the last one
 	_, message = act("pull", dos, "")
 	verifyMessage(t, message, "your task is: DONE DO")
+
+	// then there are none left to swap
+	_, message = act("swap", dos, "")
+	verifyMessage(t, message, "[no undone tasks to swap for!]")
+}
+
+func TestSwapActionEmptyList(t *testing.T) {
+	dos := []Do{}
+
+	_, message := act("swap", dos, "")
+	verifyMessage(t, message, "[no undone tasks to swap for!]")
 }
 
 func TestBadAction(t *testing.T) {
