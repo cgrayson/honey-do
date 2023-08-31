@@ -124,7 +124,7 @@ func replaceLastPulled(dos []Do) Do {
 		// find the latest pulled-date
 		for i, do := range dos {
 			// PulledDate shouldn't be set at all if Done isn't true, but just in case
-			if do.Done && do.Metadata.PulledDate.After(latest.Metadata.PulledDate) {
+			if do.Done && (do.Metadata.PulledDate.After(latest.Metadata.PulledDate) || do.Metadata.PulledDate.Equal(latest.Metadata.PulledDate)) {
 				replacedIndex = i
 				latest = dos[replacedIndex]
 			}

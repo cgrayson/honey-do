@@ -5,7 +5,7 @@ import "testing"
 func TestPullEmptyList(t *testing.T) {
 	pulled := pullDo([]Do{})
 	if pulled.Task != "" {
-		t.Errorf("pulled should be empty (%s)", pulled.Task)
+		t.Errorf("pulled task should be empty, not '%s'", pulled.Task)
 	}
 }
 
