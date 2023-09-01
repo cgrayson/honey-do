@@ -1,3 +1,5 @@
+[![Go package](https://github.com/cgrayson/honey-do/actions/workflows/test.yml/badge.svg)](https://github.com/cgrayson/honey-do/actions/workflows/test.yml)
+
 # Honey-Do
 
 Usage: `honey-do [ pull (default) | unpull | swap | add _"task"_ ] filename`
