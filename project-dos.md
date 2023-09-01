@@ -3,6 +3,7 @@
 - [ ] is there a better way to check for a nil Do than comparing .Task to ""?
 - [ ] add tests
   - [ ] what if an added task is empty? or just whitespace?
+  - [ ] add more coverage per `go tool cover`
   - [x] test unpull for item not marked done but with pulled timestamp (corrupt file)
   - [x] test for empty file (pull, unpull, & swap)
   - [x] for pullDo()

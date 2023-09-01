@@ -20,7 +20,7 @@ func TestPullAction(t *testing.T) {
 }
 
 func TestPullActionEmptyList(t *testing.T) {
-	dos := []Do{}
+	var dos []Do
 
 	_, message := act("pull", dos, "")
 	verifyMessage(t, message, "[no undone tasks found!]")
@@ -49,7 +49,7 @@ func TestUnpullAction(t *testing.T) {
 }
 
 func TestUnpullActionEmptyList(t *testing.T) {
-	dos := []Do{}
+	var dos []Do
 
 	_, message := act("unpull", dos, "")
 	verifyMessage(t, message, "[no tasks to return]")
@@ -72,7 +72,7 @@ func TestSwapAction(t *testing.T) {
 }
 
 func TestSwapActionEmptyList(t *testing.T) {
-	dos := []Do{}
+	var dos []Do
 
 	_, message := act("swap", dos, "")
 	verifyMessage(t, message, "[no undone tasks to swap for!]")
