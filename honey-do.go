@@ -33,18 +33,23 @@ func closeFile(file *os.File) {
 	}
 }
 
-func readFile(file string) []string {
+func readFile(file string) (lines []string) {
 	f, err := os.Open(file)
 	if err != nil {
+		if strings.Contains(err.Error(), "no such file or directory") {
+			// print warning and return without error; we might be adding the first do
+			fmt.Printf("[file '%s' not found]\n", file)
+			lines = append(lines, "boo")
+			return lines
+		}
 		log.Fatal(err)
 	}
 	defer closeFile(f)
-	var lines []string
+
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		lines = append(lines, input.Text())
 	}
-
 	return lines
 }
 
