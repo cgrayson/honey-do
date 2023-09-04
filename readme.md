@@ -2,30 +2,22 @@
 
 # Honey-Do
 
-Usage: `honey-do [ pull (default) | unpull | swap | add _"task"_ ] filename`
+Honey-do is a task/to-do list meant to imitate the old-fashioned "job-jar". 
+Instead of writing tasks on a slip of paper that's folded up and stuffed
+into a jar to be pulled out at random, this simple command-line app manages
+lines in a markdown-flavored plain text file of your choosing. You can add
+new tasks, pull a random one, swap the last one for another, or just put 
+the last one back if you change your mind. 
+
+Usage: `honey-do [ pull (default) | unpull | swap | add "task" ] filename`
 
 A default honey-do file can be set via the environment variable `HONEY_DO_FILE`. 
-When set, no `filename` is needed on the command line. If one is given, it will
-override the environment variable.
+When set, no `filename` is needed on the command line. If a filename is given
+on the command-line, it overrides the environment variable.
 
-## Development
+## about
 
-- `go test` to run test suite
-
----
-
-original notes (4/17/23)
-
-> honey.do
-> 
-> a random, limited-view to-do list
-> 
-> - local file stored in `/Library/Mobile Documents/com~apple~CloudDocs/`
-> - markdown with checkbox style, one item per line
-> - metadata, like added-date & completed-date, stored in curly brackets, JSON-style (`{added_date: "Mon. Apr. 17", etc.}`)
-> - Go app
-> - make library for using local file as simple database
-> - **pull** (default): reads the unfinished items & returns one random one, marking it done (add `x` & move to top of bottom)
-> - **add**: add a new item
-> - **undo**: find latest done item & undo it
-> - **re-pull**: “undo”, plus picks another (excluding the just undone)
+I had the brilliant idea for this groundbreaking app all by myself, and 
+likewise have implemented it here, from scratch and with no intelligence other
+than my own, as a pastime and to apply what I was learning about developing
+in Go.
