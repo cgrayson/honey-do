@@ -205,14 +205,18 @@ func parseCommandLine(args []string) (action string, filename string, newTask st
 	}
 	validActions := []string{"pull", "add", "unpull", "swap"}
 
-	for i := 1; i < len(args); i++ {
+	for i := 1; i < len(args); i++ { // start at 1 to skip executable name
 		currentArg := args[i]
 		if slices.Contains(validActions, currentArg) {
 			action = currentArg
 
 			if action == "add" {
 				i++
-				newTask = args[i]
+				if len(args) > i { // make sure there's another arg to get
+					newTask = args[i]
+				} else {
+					newTask = "" // empty task will be rejected later
+				}
 			}
 		} else {
 			// must be a filename
@@ -245,9 +249,14 @@ func act(action string, dos []Do, task string) ([]Do, string) {
 			message = fmt.Sprintf("[no undone tasks found!]")
 		}
 	case "add":
-		newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
-		message = fmt.Sprintf("added task: %s", newDo.Task)
-		dos = append(dos, newDo)
+		task := strings.TrimSpace(task)
+		if task != "" {
+			newDo := Do{Done: false, Task: task, Metadata: Metadata{AddedDate: time.Now()}}
+			message = fmt.Sprintf("added task: %s", newDo.Task)
+			dos = append(dos, newDo)
+		} else {
+			message = "[no task to add]"
+		}
 	case "unpull":
 		aDo := replaceLastPulled(dos)
 		if aDo.Task != "" {

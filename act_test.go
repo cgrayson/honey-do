@@ -33,6 +33,13 @@ func TestAddAction(t *testing.T) {
 	verifyMessage(t, message, "added task: Do this other thing")
 }
 
+func TestAddActionEmptyTask(t *testing.T) {
+	dos := readDos("./fixtures/fixture-test.md")
+
+	_, message := act("add", dos, "")
+	verifyMessage(t, message, "[no task to add]")
+}
+
 func TestUnpullAction(t *testing.T) {
 	dos := readDos("./fixtures/fixture-test.md")
 

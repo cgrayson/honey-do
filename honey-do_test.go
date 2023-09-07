@@ -147,6 +147,34 @@ func TestAddOnlyNoEnv(t *testing.T) {
 
 }
 
+func TestAddWithEmptyTask(t *testing.T) {
+	_ = os.Unsetenv("HONEY_DO_FILE")
+	action, filename, taskText := parseCommandLine(append(baseArgs, "add", ""))
+	if action != "add" {
+		t.Errorf("action should be add (%s)", action)
+	}
+	if filename != "" {
+		t.Errorf("filename should be empty (%s)", filename)
+	}
+	if taskText != "" {
+		t.Errorf("task text should be empty (%s)", taskText)
+	}
+}
+
+func TestAddWithNoTask(t *testing.T) {
+	_ = os.Unsetenv("HONEY_DO_FILE")
+	action, filename, taskText := parseCommandLine(append(baseArgs, "add"))
+	if action != "add" {
+		t.Errorf("action should be add (%s)", action)
+	}
+	if filename != "" {
+		t.Errorf("filename should be empty (%s)", filename)
+	}
+	if taskText != "" {
+		t.Errorf("task text should be empty (%s)", taskText)
+	}
+}
+
 // honey-do add "task" # with env
 func TestAddOnlyWithEnv(t *testing.T) {
 	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
