@@ -4,7 +4,7 @@ import "testing"
 
 func TestPullEmptyList(t *testing.T) {
 	pulled := pullDo([]Do{})
-	if pulled.Task != "" {
+	if pulled != (Do{}) {
 		t.Errorf("pulled task should be empty, not '%s'", pulled.Task)
 	}
 }
@@ -27,7 +27,7 @@ func TestPullLast(t *testing.T) {
 	}
 
 	aDo = pullDo(dos)
-	if aDo.Task != "" {
+	if aDo != (Do{}) {
 		t.Errorf("pulled task should have been '' (empty string), not '%s'", aDo.Task)
 	}
 }

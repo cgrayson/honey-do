@@ -242,7 +242,7 @@ func act(action string, dos []Do, task string) ([]Do, string) {
 	case "pull":
 		if numUndone >= 1 {
 			aDo := pullDo(dos)
-			if aDo.Task != "" {
+			if aDo != (Do{}) {
 				message = fmt.Sprintf("your task is: %s", aDo.Task)
 			}
 		} else {
@@ -259,7 +259,7 @@ func act(action string, dos []Do, task string) ([]Do, string) {
 		}
 	case "unpull":
 		aDo := replaceLastPulled(dos)
-		if aDo.Task != "" {
+		if aDo != (Do{}) {
 			message = fmt.Sprintf("returned task: %s", aDo.Task)
 		} else {
 			message = fmt.Sprintf("[no tasks to return]")
@@ -267,7 +267,7 @@ func act(action string, dos []Do, task string) ([]Do, string) {
 	case "swap":
 		if numUndone >= 1 { // have to have at least 1 undone to swap
 			aDo := replaceLastPulled(dos)
-			if aDo.Task != "" {
+			if aDo != (Do{}) {
 				message = fmt.Sprintf("returned task: %s", aDo.Task)
 				for {
 					newDo := pullDo(dos)

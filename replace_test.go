@@ -25,7 +25,7 @@ func TestReplaceEmptyList(t *testing.T) {
 	dos := []Do{}
 
 	aDo := replaceLastPulled(dos)
-	if aDo.Task != "" {
+	if aDo != (Do{}) {
 		t.Errorf("unpulled task should be empty, not '%s'", aDo.Task)
 	}
 }
