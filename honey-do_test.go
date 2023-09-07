@@ -8,230 +8,60 @@ import (
 // 0th arg is the executable name
 var baseArgs = []string{"honey-do"}
 
-// honey-do # no env
-func TestNoParametersNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(baseArgs)
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "" {
-		t.Errorf("filename should be empty (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
+const filename1 = "/tmp/honey-do.md"
+const filename2 = "this-here-honey-do.md"
 
-// honey-do # with env
-func TestNoParametersWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(baseArgs)
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "/tmp/honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
+func TestParseCommandLine(t *testing.T) {
 
-// honey-do pull # no env
-func TestActionOnlyNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "pull"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "" {
-		t.Errorf("filename should be empty (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
+	var tests = []struct {
+		setEnvFilename   bool
+		params           []string
+		expectedAction   string
+		expectedFilename string
+		expectedTask     string
+	}{
+		{false, nil, "pull", "", ""},
+		{true, nil, "pull", filename1, ""},
 
-// honey-do pull # with env
-func TestActionOnlyWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "pull"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "/tmp/honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
+		{false, []string{"pull"}, "pull", "", ""},
+		{true, []string{"pull"}, "pull", filename1, ""},
 
-// honey-do filename # no env
-func TestFilenameOnlyNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "pull", "this-here-honey-do.md"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
+		{false, []string{filename2}, "pull", filename2, ""},
+		{true, []string{filename2}, "pull", filename2, ""},
 
-// honey-do filename # with env
-func TestFilenameOnlyWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "this-here-honey-do.md"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
+		{false, []string{"pull", filename2}, "pull", filename2, ""},
+		{true, []string{"pull", filename2}, "pull", filename2, ""},
+
+		{false, []string{"add", "Do this task"}, "add", "", "Do this task"},
+		{true, []string{"add", "Do this task"}, "add", filename1, "Do this task"},
+
+		{false, []string{"add", ""}, "add", "", ""},
+		{false, []string{"add"}, "add", "", ""},
+
+		{false, []string{"add", "Do this task", filename2}, "add", filename2, "Do this task"},
+		{true, []string{"add", "Do this task", filename2}, "add", filename2, "Do this task"},
+
+		{false, []string{"foo"}, "pull", "foo", ""},
 	}
 
-}
+	for i, test := range tests {
+		if test.setEnvFilename {
+			_ = os.Setenv("HONEY_DO_FILE", filename1)
+		} else {
+			_ = os.Unsetenv("HONEY_DO_FILE")
+		}
 
-// honey-do pull filename # no env
-func TestActionAndFilenameNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "pull", "this-here-honey-do.md"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
+		action, filename, taskText := parseCommandLine(append(baseArgs, test.params...))
 
-}
-
-// honey-do pull filename # with env
-func TestActionAndFilenameWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "pull", "this-here-honey-do.md"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-
-}
-
-// honey-do add "task" # no env
-func TestAddOnlyNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add", "Do this task"))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "" {
-		t.Errorf("filename should be empty (%s)", filename)
-	}
-	if taskText != "Do this task" {
-		t.Errorf("task text should be set (%s)", taskText)
-	}
-
-}
-
-func TestAddWithEmptyTask(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add", ""))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "" {
-		t.Errorf("filename should be empty (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
-
-func TestAddWithNoTask(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add"))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "" {
-		t.Errorf("filename should be empty (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
-	}
-}
-
-// honey-do add "task" # with env
-func TestAddOnlyWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add", "Do this task"))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "/tmp/honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "Do this task" {
-		t.Errorf("task text should be set (%s)", taskText)
-	}
-}
-
-// honey-do add "task" filename # no env
-func TestAddAndFilenameNoEnv(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add", "Do this task", "this-here-honey-do.md"))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "Do this task" {
-		t.Errorf("task text should be set (%s)", taskText)
-	}
-}
-
-// honey-do add "task" filename # with env
-func TestAddAndFilenameWithEnv(t *testing.T) {
-	_ = os.Setenv("HONEY_DO_FILE", "/tmp/honey-do.md")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "add", "Do this task", "this-here-honey-do.md"))
-	if action != "add" {
-		t.Errorf("action should be add (%s)", action)
-	}
-	if filename != "this-here-honey-do.md" {
-		t.Errorf("filename should be set (%s)", filename)
-	}
-	if taskText != "Do this task" {
-		t.Errorf("task text should be set (%s)", taskText)
-	}
-}
-
-// honey-do foo
-func TestInvalidActionOnly(t *testing.T) {
-	_ = os.Unsetenv("HONEY_DO_FILE")
-	action, filename, taskText := parseCommandLine(append(baseArgs, "foo"))
-	if action != "pull" {
-		t.Errorf("action should be pull (%s)", action)
-	}
-	if filename != "foo" {
-		t.Errorf("filename should be foo (%s)", filename)
-	}
-	if taskText != "" {
-		t.Errorf("task text should be empty (%s)", taskText)
+		if action != test.expectedAction {
+			t.Errorf("%d: action should be %q, not %q", i, test.expectedAction, action)
+		}
+		if filename != test.expectedFilename {
+			t.Errorf("%d: filename should be %q, not %q", i, test.expectedFilename, filename)
+		}
+		if taskText != test.expectedTask {
+			t.Errorf("%d: task text should be %q, not %s", i, test.expectedTask, taskText)
+		}
 	}
 }
 
