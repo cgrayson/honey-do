@@ -180,6 +180,16 @@ func pullDo(dos []Do) (aDo Do) {
 	return aDo
 }
 
+func helpRequested(args []string) bool {
+	if len(args) > 1 {
+		switch strings.ToLower(args[1]) {
+		case "--help", "-?", "help", "?", "-h", "h":
+			return true
+		}
+	}
+	return false
+}
+
 // possibilities:
 // honey-do
 // honey-do pull
@@ -189,6 +199,10 @@ func pullDo(dos []Do) (aDo Do) {
 // honey-do add "task" filename
 // etc.
 func parseCommandLine(args []string) (action string, filename string, newTask string) {
+	// check for help first
+	if helpRequested(args) {
+		return "help", "", ""
+	}
 	validActions := []string{"pull", "add", "unpull", "swap"}
 
 	for i := 1; i < len(args); i++ {
@@ -271,6 +285,11 @@ func act(action string, dos []Do, task string) ([]Do, string) {
 
 func main() {
 	action, filename, task := parseCommandLine(os.Args)
+
+	if action == "help" {
+		fmt.Println("honey-do [ pull | unpull | swap | add 'task' ] filename.md (or $HONEY_DO_FILE)")
+		return
+	}
 
 	if filename == "" {
 		fmt.Println("[oops: you have to specify a honey-do file to work with]")

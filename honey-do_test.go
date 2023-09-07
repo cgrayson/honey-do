@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-var baseArgs = []string{"exe"}
+// 0th arg is the executable name
+var baseArgs = []string{"honey-do"}
 
 // honey-do # no env
 func TestNoParametersNoEnv(t *testing.T) {
@@ -203,6 +204,16 @@ func TestInvalidActionOnly(t *testing.T) {
 	}
 	if taskText != "" {
 		t.Errorf("task text should be empty (%s)", taskText)
+	}
+}
+
+func TestHelpFlags(t *testing.T) {
+	helpFlags := []string{"--help", "-?", "help", "?", "-h", "h", "--HELP", "HELP", "-H", "H"}
+	for _, flag := range helpFlags {
+		action, _, _ := parseCommandLine(append(baseArgs, flag))
+		if action != "help" {
+			t.Errorf("action should be help for flag %q (not %s)", flag, action)
+		}
 	}
 }
 
